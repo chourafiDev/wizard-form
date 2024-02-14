@@ -20,7 +20,7 @@ import RadioInput from "@/components/ui/RadioInput";
 const PartTimeAvailability = () => {
   const dispatch = useDispatch();
 
-  // get currentStep and frormData from the store
+  // get currentStep and availabilityData from the store
   const { currentStep, availabilityData } = useSelector(
     (state: RootState) => state.wizardForm
   );
