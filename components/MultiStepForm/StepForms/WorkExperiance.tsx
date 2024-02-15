@@ -30,6 +30,8 @@ const WorkExperiance = () => {
     defaultValues: { ...formData },
   });
 
+  console.log(errors.experiances);
+
   // handle submit form
   const onSubmit = async (data: TWorkExperianceShcema) => {
     dispatch(setFormData(data));
@@ -72,28 +74,29 @@ const WorkExperiance = () => {
               placeholder="e.g. https://www.github.com/username"
             />
 
-            {/* <fieldset className="space-y-2">
-              <legend className="text-dark font-medium">
+            <fieldset>
+              <legend className="mb-3 font-medium text-base text-dark">
                 Experiance Fields
               </legend>
+              <div className="grid grid-cols-2 gap-3">
+                {experianceFields.map(({ id, label, value }) => (
+                  <MultiCheckBox
+                    key={id}
+                    name="experiances"
+                    id={id}
+                    value={value}
+                    label={label}
+                    register={register}
+                  />
+                ))}
+              </div>
 
-              {experianceFields.map(({ id, value }) => (
-                <MultiCheckBox
-                  key={id}
-                  name="experianceFields"
-                  id="WPThemeDevelopment"
-                  value="WP Theme Development"
-                  label="WP Theme Development"
-                  register={register}
-                />
-              ))}
-
-              {errors && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.experianceFields?.message}
+              {errors.experiances && (
+                <p className="text-red-500 text-sm mt-2">
+                  {errors.experiances.message}
                 </p>
               )}
-            </fieldset> */}
+            </fieldset>
           </div>
         </div>
 
