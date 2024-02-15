@@ -7,7 +7,9 @@ import Image from "next/image";
 
 const Complete = () => {
   // get frormData and currentStep from the store
-  const { currentStep } = useSelector((state: RootState) => state.wizardForm);
+  const { currentStep, finalData } = useSelector(
+    (state: RootState) => state.wizardForm
+  );
 
   return (
     <motion.div
@@ -38,6 +40,8 @@ const Complete = () => {
             interview.
           </p>
         </div>
+
+        {/* <pre>{JSON.stringify(finalData, null, 2)}</pre> */}
 
         <NavButtons />
       </div>
