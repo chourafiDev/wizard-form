@@ -31,7 +31,6 @@ const CoverLetterResume = () => {
     register,
     handleSubmit,
     setValue,
-    watch,
     formState: { errors },
   } = useForm<TCoverLetterResumeShcema>({
     resolver: zodResolver(coverLetterResumeShcema),
@@ -55,18 +54,18 @@ const CoverLetterResume = () => {
 
   // handle submit form
   const onSubmit = async (data: TCoverLetterResumeShcema) => {
-    dispatch(setFormData(data));
+    let newData = data;
+
+    if (data.resume[0]) {
+      const file = data.resume[0];
+      const base64 = await convertFileToBase64(file);
+
+      newData = { ...data, resume: base64 };
+    }
+
+    dispatch(setFormData(newData));
     dispatch(setCurrentStep(currentStep + 1));
     dispatch(setMergeData());
-    // try {
-    //   if (data.fileUpload) {
-    //     const file = data.fileUpload[0];
-    //     const base64 = await convertFileToBase64(file);
-    //     setValue("fileUpload", base64);
-    //   }
-    // } catch (error) {
-    //   console.error("Error converting file to base64:", error);
-    // }
   };
 
   return (
@@ -95,14 +94,14 @@ const CoverLetterResume = () => {
             ></TextArea>
 
             <div className="w-full flex flex-col mt-6 mb-4 space-y-1">
-              {/* {errors.fileUpload && (
+              {/* {errors.file && (
                 <p className="text-red-500 text-sm ml-auto">
-                  {errors.fileUpload.message}
+                  {errors?.file?.message}
                 </p>
               )} */}
-              {/* <label
+              <label
                 className={`w-full bg-white border border-dashed ${
-                  errors.file ? "border-red-500" : "border-gray"
+                  errors.resume ? "border-red-500" : "border-gray"
                 } rounded-md p-4 flex justify-center items-center gap-3 cursor-pointer`}
               >
                 <FiUploadCloud className="text-dark text-xl" />
@@ -113,9 +112,9 @@ const CoverLetterResume = () => {
                   id="file-upload"
                   type="file"
                   className="sr-only"
-                  {...register("file")}
+                  {...register("resume")}
                 />
-              </label> */}
+              </label>
             </div>
 
             <CheckBox
