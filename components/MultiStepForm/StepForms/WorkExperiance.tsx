@@ -10,7 +10,7 @@ import { motion } from "framer-motion";
 import Select from "@/components/ui/Select";
 import TextInput from "@/components/ui/TextInput";
 import { experianceFields, workExperiance } from "@/utils/data";
-import MultiCheckBox from "@/components/ui/MultiCheckBoxes";
+import CheckBox from "@/components/ui/CheckBox";
 
 const WorkExperiance = () => {
   const dispatch = useDispatch();
@@ -80,10 +80,9 @@ const WorkExperiance = () => {
               </legend>
               <div className="grid grid-cols-2 gap-3">
                 {experianceFields.map(({ id, label, value }) => (
-                  <MultiCheckBox
+                  <CheckBox
                     key={id}
                     name="experiances"
-                    id={id}
                     value={value}
                     label={label}
                     register={register}
