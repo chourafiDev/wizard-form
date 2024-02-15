@@ -57,6 +57,12 @@ export const workExperianceShcema = z.object({
     .string()
     .url()
     .includes("github.com", { message: "Invalid GitHub URL" }),
+  experiances: z.array(z.string()).nonempty({
+    message: "You have to select at least one field.",
+  }),
+  // .refine((value) => value.some((item) => item), {
+  //   message: "You have to select at least one item.",
+  // }),
 });
 
 const isValidFile = (value: string) => {
