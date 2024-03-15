@@ -1,5 +1,12 @@
 import { z } from "zod";
 
+export const MAX_FILE_SIZE = 2 * 1024 * 1024;
+export const ACCEPTED_FILE_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "application/pdf",
+];
+
 export const personalInfoShcema = z.object({
   fullName: z.string().trim().min(2, { message: "Full name is required" }),
   email: z
@@ -18,7 +25,16 @@ export const personalInfoShcema = z.object({
 });
 
 export const availabilityShcema = z.object({
-  availability: z.string({ invalid_type_error: "Please select availability" }),
+  availability: z.enum(
+    [
+      "full time availability",
+      "part time availability",
+      "freelancer / Contract availability",
+    ],
+    {
+      errorMap: () => ({ message: "Please select availability." }),
+    }
+  ),
 });
 
 export const availabilityStatusShcema = z.object({
@@ -28,7 +44,9 @@ export const availabilityStatusShcema = z.object({
   availabilityLooking: z
     .string()
     .min(1, { message: "Please select an availability" }),
-  remotely: z.string({ invalid_type_error: "Work remotely is required" }),
+  remotely: z.enum(["morning", "afternoon", "no preferences"], {
+    errorMap: () => ({ message: "Please select availability." }),
+  }),
 });
 
 export const freelanceContractavailabilityShcema = z.object({
@@ -65,19 +83,22 @@ export const workExperianceShcema = z.object({
   // }),
 });
 
-const isValidFile = (value: string) => {
-  const allowedExtensions = ["pdf", "doc", "docx"];
-  const fileExtension = value?.split(".")?.pop()?.toLowerCase() as string;
-  return allowedExtensions.includes(fileExtension);
-};
-
 export const coverLetterResumeShcema = z.object({
   coverLatter: z
     .string()
     .trim()
     .min(10, { message: "Cover Letter is required" }),
-  // fileUpload: z.string().optional(),
-  // file: z.string().optional(),
+  resume: z
+    .instanceof(FileList, { message: "Resume is required." })
+    .refine((fileList) => fileList.length > 0, {
+      message: "Resume is required.",
+    })
+    .refine((fileList) => fileList[0]?.size <= MAX_FILE_SIZE, {
+      message: "The file size must be less than 2MB.",
+    })
+    .refine((fileList) => ACCEPTED_FILE_TYPES.includes(fileList[0].type), {
+      message: "Invalid file type.",
+    }),
   accept: z.boolean().refine((value) => value === true, {
     message: "Accept conditions is required",
   }),

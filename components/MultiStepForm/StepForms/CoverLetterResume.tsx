@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import NavButtons from "../NavButtons";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
@@ -10,6 +10,7 @@ import {
   setMergeData,
 } from "@/store/features/wizardFormSlice";
 import {
+  ACCEPTED_FILE_TYPES,
   TCoverLetterResumeShcema,
   coverLetterResumeShcema,
 } from "@/libs/validation";
@@ -26,44 +27,38 @@ const CoverLetterResume = () => {
     (state: RootState) => state.wizardForm
   );
 
+  const [base64, setBase64] = useState<string | null>(null);
+
   // set up hook form
   const {
     register,
     handleSubmit,
-    setValue,
+    control,
     formState: { errors },
   } = useForm<TCoverLetterResumeShcema>({
     resolver: zodResolver(coverLetterResumeShcema),
     defaultValues: { ...formData },
   });
 
-  const convertFileToBase64 = async (file: any) => {
-    return new Promise<string>((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        if (typeof reader.result === "string") {
-          resolve(reader.result.split(",")[1]);
-        } else {
-          reject(new Error("Failed to convert file to base64."));
-        }
-      };
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
+  const convertToBase64 = (file: any) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => {
+      setBase64(reader.result as string);
+    };
+    reader.onerror = (error) => {
+      console.error("Error converting file to Base64:", error);
+    };
   };
 
   // handle submit form
   const onSubmit = async (data: TCoverLetterResumeShcema) => {
-    let newData = data;
+    const payload = {
+      ...data,
+      resume: base64,
+    };
 
-    if (data.resume[0]) {
-      const file = data.resume[0];
-      const base64 = await convertFileToBase64(file);
-
-      newData = { ...data, resume: base64 };
-    }
-
-    dispatch(setFormData(newData));
+    dispatch(setFormData(payload));
     dispatch(setCurrentStep(currentStep + 1));
     dispatch(setMergeData());
   };
@@ -94,11 +89,11 @@ const CoverLetterResume = () => {
             ></TextArea>
 
             <div className="w-full flex flex-col mt-6 mb-4 space-y-1">
-              {/* {errors.file && (
+              {errors.resume && (
                 <p className="text-red-500 text-sm ml-auto">
-                  {errors?.file?.message}
+                  {errors.resume.message}
                 </p>
-              )} */}
+              )}
               <label
                 className={`w-full bg-white border border-dashed ${
                   errors.resume ? "border-red-500" : "border-gray"
@@ -108,11 +103,28 @@ const CoverLetterResume = () => {
                 <span className="mt-2 text-base text-dark/70 leading-normal">
                   Select a file
                 </span>
-                <input
-                  id="file-upload"
-                  type="file"
-                  className="sr-only"
-                  {...register("resume")}
+                <Controller
+                  name="resume"
+                  control={control}
+                  render={({ field }) => (
+                    <input
+                      type="file"
+                      id="CV"
+                      className="sr-only"
+                      name={field.name}
+                      ref={field.ref}
+                      onBlur={field.onBlur}
+                      onChange={(e) => {
+                        if (e.target.files && e.target.files.length > 0) {
+                          const file = e.target.files[0];
+                          field.onChange(e.target.files);
+                          convertToBase64(file);
+                        }
+                      }}
+                      accept={ACCEPTED_FILE_TYPES.join(",")}
+                      disabled={field.disabled}
+                    />
+                  )}
                 />
               </label>
             </div>
