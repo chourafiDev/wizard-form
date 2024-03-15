@@ -15,7 +15,6 @@ import PartTimeAvailability from "./StepForms/PartTimeAvailability";
 import CoverLetterResume from "./StepForms/CoverLetterResume";
 import WorkExperiance from "./StepForms/WorkExperiance";
 import FreelanceContractAvailability from "./StepForms/FreelanceContractAvailability";
-import ProgressBar from "./ProgressBar";
 
 const StepForm = () => {
   const { currentStep, formData } = useSelector(
@@ -49,9 +48,9 @@ const StepForm = () => {
         break;
     }
   }
+
   return (
     <div className="w-full flex flex-col lg:h-screen h-full gap-6 py-10 lg:pr-28 lg:px-0 md:px-10 px-4 overflow-hidden">
-      {currentStep < 6 && <ProgressBar />}
       {renderFormByStep(currentStep)}
     </div>
   );
